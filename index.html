@@ -51,17 +51,19 @@
       })
     });
 
-    let balls = [{ x: 200, y: 200, radius: 130, speedx: 1, speedy: 1 }, // white
-    { x: 700, y: 150, radius: 110, speedx: 2, speedy: 2 }]; // yellow
-    // { x: 100, y: 100, radius: 90, speedx: 4, speedy: 4 }, // green
-    // { x: 100, y: 100, radius: 70, speedx: 5, speedy: 5 }, // gray
-    // { x: 100, y: 100, radius: 50, speedx: 8, speedy: 8 }, // red
-    // { x: 100, y: 100, radius: 30, speedx: 10, speedy: 10 },  // purple
-    // { x: 100, y: 100, radius: 10, speedx: 20, speedy: 20 }]; // blue
+    let balls = [{ x: 100, y: 100, radius: 50, speedx: 1, speedy: 1 }, // white
+    { x: 200, y: 200, radius: 50, speedx: 1, speedy: 1 }, // yellow
+    { x: 500, y: 300, radius: 50, speedx: 1, speedy: 1 }, // green
+    { x: 500, y: 500, radius: 50, speedx: 1, speedy: 1 }, // red
+    { x: 400, y: 400, radius: 50, speedx: 1, speedy: 1 }, // gray
+    { x: 600, y: 200, radius: 50, speedx: 1, speedy: 1 },  // purple
+    { x: 700, y: 300, radius: 50, speedx: 1, speedy: 1 }]; // blue
+
     let canvas = document.getElementById("canvas");
     let ctx = canvas.getContext("2d");
     let main_distance = 0;
     let sab_distance = 0;
+    let correction = 0;
 
     function drawArc_white() {
       ctx.beginPath();
@@ -90,21 +92,21 @@
       ctx.fill();
       ctx.closePath();
     }
-    function drawArc_gray() {
-      ctx.beginPath();
-      ctx.arc(balls[3].x, balls[3].y, balls[3].radius, 0, Math.PI * 2, false);
-      ctx.strokeStyle = "#808080";
-      ctx.stroke();
-      ctx.fillStyle = "#808080";
-      ctx.fill();
-      ctx.closePath();
-    }
     function drawArc_red() {
       ctx.beginPath();
-      ctx.arc(balls[4].x, balls[4].y, balls[4].radius, 0, Math.PI * 2, false);
+      ctx.arc(balls[3].x, balls[3].y, balls[3].radius, 0, Math.PI * 2, false);
       ctx.strokeStyle = "#eb2142";
       ctx.stroke();
       ctx.fillStyle = "#eb2142";
+      ctx.fill();
+      ctx.closePath();
+    }
+    function drawArc_gray() {
+      ctx.beginPath();
+      ctx.arc(balls[4].x, balls[4].y, balls[4].radius, 0, Math.PI * 2, false);
+      ctx.strokeStyle = "#808080";
+      ctx.stroke();
+      ctx.fillStyle = "#808080";
       ctx.fill();
       ctx.closePath();
     }
@@ -145,63 +147,46 @@
     }
 
     // ボール同士の当たり判定
-    let diagonal_line = [];
-    for (let i = 0; i < balls.length; i++) {
-      // 1描写当たりに進む距離
-      diagonal_line.push(Math.sqrt(balls[i].speedx ** 2 + balls[i].speedy ** 2));
-    }
     function ball_bound() {
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
           // 各円のそれぞれの中点の距離
-          main_distance = Math.floor(Math.sqrt((balls[i].x - balls[j].x) ** 2 + (balls[i].y - balls[j].y) ** 2));
+          main_distance = Math.sqrt((balls[i].x - balls[j].x) ** 2 + (balls[i].y - balls[j].y) ** 2);
           // 円の内側に接する正方形に対する中点からの最短距離
           sab_distance = balls[i].radius / Math.sqrt(2);
-          
+          console.log(main_distance, balls[i].speedx, balls[j].speedx)
+
           // 当たり判定がTrueの場合
-          if (main_distance === balls[i].radius + balls[j].radius + 1) {
+          if (main_distance <= balls[i].radius + balls[j].radius) {
             // X方向の運動を主として考える
-            if (balls[j].x - balls[j].radius > balls[i].x + sab_distance ||
-            balls[j].x + balls[j].radius < balls[i].x - sab_distance) {
-              // 接点のX座標がballs[i].xからどれだけ離れているか及びボールの大きさの違いをspeedxに反映
-              // if (balls[j].x > balls[i].x) { // balls[i]の右側で接している
-                // balls[i]のX方向の運動を修正
-                // balls[i].speedx += balls[j].speedx * Math.abs(balls[i].x - (balls[j].x - balls[j].radius)) / balls[i].radius * balls[j].radius / balls[i].radius * 0.7;
-                // // balls[j]のX方向の運動を修正
-                // balls[j].speedx += balls[i].speedx * Math.abs(balls[j].x - (balls[i].x + balls[i].radius)) / balls[j].radius * balls[i].radius / balls[j].radius * 0.7;
+            if (balls[j].x + balls[j].radius < balls[i].x - sab_distance) { // balls[i]の左側に当たった場合
+              if (balls[i].speedx != balls[j].speedx) {
+                balls[i].speedx *= -1;
+              }
+              balls[j].speedx *= -1;
+            } else if (balls[j].x - balls[j].radius > balls[i].x + sab_distance) { // balls[i]の右側に当たった場合
+              if (balls[i].speedx != balls[j].speedx) {
                 balls[j].speedx *= -1;
-                
-              // } else { // balls[i]の左側で接している
-                  //           // balls[i]のX方向の運動を修正
-                  //           balls[i].speedx += balls[j].speedx * Math.abs(balls[i].x - (balls[j].x + balls[j].radius)) / balls[i].radius * balls[j].radius / balls[i].radius;
-                  //           // balls[j]のX方向の運動を修正
-                  //           balls[j].speedx += balls[i].speedx * Math.abs(balls[j].x - (balls[i].x - balls[i].radius)) / balls[j].radius * balls[i].radius / balls[j].radius;
-              // }
-                
-              // balls[i]のY方向の運動を修正
-              balls[i].speedy = Math.sqrt(diagonal_line[i] ** 2 - balls[i].speedx ** 2) * (balls[i].speedy / Math.abs(balls[i].speedy)); // Y方向の運動は符号を保ったまま
-              // balls[j]のY方向の運動を修正
-              balls[j].speedy = Math.sqrt(diagonal_line[j] ** 2 - balls[j].speedx ** 2) * (balls[j].speedy / Math.abs(balls[j].speedy)); // Y方向の運動は符号を保ったまま
-
-      //       } else { // Y方向の運動を主として考える
-      //         if (balls[j].y > balls[i].y) { // balls[i]の下側で接している
-      //           // balls[i]のY方向の運動を修正
-      //           balls[i].speedy += balls[j].speedy * Math.abs(balls[i].y - (balls[j].y - balls[j].radius)) / balls[i].radius * balls[j].radius / balls[i].radius;
-      //           // balls[j]のY方向の運動を修正
-      //           balls[j].speedy += balls[i].speedy * Math.abs(balls[j].y - (balls[i].y + balls[i].radius)) / balls[j].radius * balls[i].radius / balls[j].radius;
-
-      //         } else { // balls[i]の上側で接している
-      //           // balls[i]のY方向の運動を修正
-      //           balls[i].speedy += balls[j].speedy * Math.abs(balls[i].y - (balls[j].y + balls[j].radius)) / balls[i].radius * balls[j].radius / balls[i].radius;
-      //           // balls[j]のY方向の運動を修正
-      //           balls[j].speedy += balls[i].speedy * Math.abs(balls[j].y - (balls[i].y - balls[i].radius)) / balls[j].radius * balls[i].radius / balls[j].radius;
-      //         }
-
-      //         // balls[i]のX方向の運動を修正
-      //         balls[i].speedx = Math.sqrt(diagonal_line[i] ** 2 - balls[i].speedy ** 2) * (balls[i].speedx / Math.abs(balls[i].speedx)); // X方向の運動は符号を保ったまま
-      //         // balls[j]のX方向の運動を修正
-      //         balls[j].speedx = Math.sqrt(diagonal_line[j] ** 2 - balls[j].speedy ** 2) * (balls[j].speedx / Math.abs(balls[j].speedx)); // X方向の運動は符号を保ったまま
+              }
+              balls[i].speedx *= -1;
+            } else if (balls[j].y + balls[j].radius <= balls[i].y - sab_distance) { // balls[i]の上側に当たった場合
+              if (balls[i].speedy != balls[j].speedy) {
+                balls[j].speedy *= -1;
+              }
+              balls[i].speedy *= -1;
+            } else { // balls[i]の下側に当たった場合
+              if (balls[i].speedy != balls[j].speedy) {
+                balls[i].speedy *= -1;
+              }
+              balls[j].speedy *= -1;
             }
+
+            // ボールがめり込んだ場合の補正
+            correction = balls[i].radius + balls[j].radius - main_distance;
+            balls[i].x += Math.ceil(correction) * balls[i].speedx / Math.abs(balls[i].speedx);
+            balls[i].y += Math.ceil(correction) * balls[i].speedy / Math.abs(balls[i].speedy);
+            balls[j].x += Math.ceil(correction) * balls[j].speedx / Math.abs(balls[j].speedx);
+            balls[j].y += Math.ceil(correction) * balls[j].speedy / Math.abs(balls[j].speedy);
           }
         }
       }
@@ -212,20 +197,20 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバス内の描画をすべてクリアする（X始点, Y始点, 横幅, 高さ）
       drawArc_white();
       drawArc_yellow();
-      // drawArc_green();
-      // drawArc_gray();
-      // drawArc_red();
-      // drawArc_purple();
-      // drawArc_blue();
+      drawArc_green();
+      drawArc_red();
+      drawArc_gray();
+      drawArc_purple();
+      drawArc_blue();
+      ball_bound();
       for (let i = 0; i < balls.length; i++) {
         move(i);
         wall_bound(i);
       }
-      ball_bound();
     }
 
-    // 25ミリ秒間隔で描き続ける
-    setInterval(draw, 25);
+    // 5ミリ秒間隔で描き続ける
+    setInterval(draw, 5);
 
   </script>
 </body>
