@@ -12,6 +12,21 @@ main {
   align-items: center;
 }
 
+#balls_select {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.balls_box {
+  margin: 5px;
+  width: 9%;
+  height: 200px; /* 仮 */
+  border-radius: 15px;
+  border: 1px #bfbfbf solid;
+}
+
 canvas {
   border: 2px #bfbfbf solid;
   background-color: rgb(12, 12, 12);
