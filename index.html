@@ -12,50 +12,54 @@
 <body>
   <main>
 
-    <section>
+    <section id="rule_section">
       <div class="rule_box">
-        <h1>ボールゲーム</h1>
-        <p>あなたのボールは生き残れるか！！</p>
+        <div class="left_rule_box">
+          <h1>ボールゲーーーム!!</h1>
+          <button id="start">スタート</button>
+        </div>
 
-        <h2>ルール説明</h2>
-        <ul>
-          <li>BOX内を動き回る7個のボールの内、一つを選択する</li>
-          <li>ボールは衝突上限回数に達した場合消滅する</li>
-          <li>ボールの衝突上限回数は50回</li>
-          <li>最後の1つになったらゲーム終了</li>
-        </ul>
-        <p>※壁への当たりも衝突回数に含める</p>
+        <div id="explanation">
+          <h2>ルール説明</h2>
+          <ul>
+            <li>BOX内を動き回る7個のボールの内、一つを選択する</li>
+            <li>ボールは衝突上限回数に達した場合消滅する</li>
+            <li>ボールの衝突上限回数は50回</li>
+            <li>最後の1つになったらゲーム終了</li>
+          </ul>
+          <p>※壁への当たりも衝突回数に含める</p>
+        </div>
       </div>
     </section>
 
     <section id="balls_select">
       <div class="balls_box">
-        <div id="white_ball" class="balls"></div>
-        <p id="white_count"></p>
+        <div id="black_ball" class="balls"></div>
+        <p id="black_count" class="count_text">0回</p>
       </div>
       <div class="balls_box">
         <div id="yellow_ball" class="balls"></div>
-        <p id="yellow_count"></p>
-      </div>
-      <div class="balls_box">
-        <div id="red_ball" class="balls"></div>
-        <p id="red_count"></p>
-      </div>
-      <div class="balls_box">
-        <div id="gray_ball" class="balls"></div>
-        <p id="gray_count"></p>
+        <p id="yellow_count" class="count_text">0回</p>
       </div>
       <div class="balls_box">
         <div id="green_ball" class="balls"></div>
-        <p id="green_count"></p>
+        <p id="green_count" class="count_text">0回</p>
+      </div>
+      <div class="balls_box">
+        <div id="red_ball" class="balls"></div>
+        <p id="red_count" class="count_text">0回</p>
+      </div>
+      <div class="balls_box">
+        <div id="orange_ball" class="balls"></div>
+        <p id="orange_count" class="count_text">0回</p>
       </div>
       <div class="balls_box">
         <div id="purple_ball" class="balls"></div>
-        <p id="purple_count"></p>
+        <p id="purple_count" class="count_text">0回</p>
       </div>
       <div class="balls_box">
         <div id="blue_ball" class="balls"></div>
-        <p id="blue_count"></p>
+        <p id="blue_count" class="count_text">0回</p>
       </div>
     </section>
 
@@ -65,7 +69,6 @@
 
     <section>
       <div id="btn_box">
-        <button id="result_btn">結果</button>
         <button id="submit">最初から</button>
       </div>
     </section>
@@ -82,17 +85,20 @@
       })
     });
 
-    const x = 2;
-    const y = 2;
+    const x = 2; // 1描写当たりにX軸に進む
+    const y = 2; // 1描写当たりにY軸に進む
+    const count_upper = 50; // 衝突回数の上限
     let canvas = document.getElementById("canvas");
     let ctx = canvas.getContext("2d");
-    let main_distance = 0;
-    let sab_distance = 0;
-    let correction = 0;
-    
+    let main_distance = 0; // 円の中心同士の距離
+    let sab_distance = 0; // 円の内側に接する正四角形への中点からの最短距離
+    let correction = 0; // 円の被っている距離
+    let result = 0; // ボールが残り一つかどうかの判定
+
+    // 円の初期配置のX軸候補
     let firstXarray = [70, 210, 350, 490, 630, 770, 910];
-    firstXarray = arrangement(firstXarray);
-    
+
+    // それぞれのボール
     let balls = [{ x: 0, y: 0, radius: 50, speedx: x, speedy: y },
     { x: 0, y: 0, radius: 50, speedx: x, speedy: y },
     { x: 0, y: 0, radius: 50, speedx: x, speedy: y },
@@ -100,23 +106,12 @@
     { x: 0, y: 0, radius: 50, speedx: x, speedy: y },
     { x: 0, y: 0, radius: 50, speedx: x, speedy: y },
     { x: 0, y: 0, radius: 50, speedx: x, speedy: y }];
-    let color = ["#ffffff", "#ffff00", "#006400", "#eb2142", "#808080", "#800080", "#0000cd"];
-    color = arrangement(color);
-    
-    // ボールの初期配置の決定
-    for (let i = 0; i < balls.length; i++) {
-      balls[i].x = firstXarray[i];
-      balls[i].y = Math.floor(Math.random() * (canvas.height - (balls[i].radius * 2))) + balls[i].radius;
-      // ランダムに選んだYの値が奇数なら-X軸方向に動かす
-      if (balls[i].y % 2 == 1) {
-        balls[i].speedx *= -1;
-      }
 
-      // ランダムに選んだYの10の位がが奇数なら-Y軸方向に動かす
-      if (Math.floor(balls[i].y / 10) % 2 == 1) {
-        balls[i].speedy *= -1;
-      }
-    }
+    // ボールの色
+    const color = ["#070707", "#ffff00", "#006400", "#eb2142", "#eb8d21", "#800080", "#0000cd"];
+
+    // 衝突回数管理用
+    let color_count = [0, 0, 0, 0, 0, 0, 0];
 
     // 配列をシャッフルする
     function arrangement(array) {
@@ -132,22 +127,6 @@
       return array;
     }
 
-    function drawArc(i) {
-      ctx.beginPath();
-      // 補正
-      correctionback();
-      // ボール同士の当たり判定
-      ball_bound();
-      wall_bound(i);
-      ctx.arc(balls[i].x, balls[i].y, balls[i].radius, 0, Math.PI * 2, false);
-      ctx.strokeStyle = color[i];
-      ctx.stroke();
-      ctx.fillStyle = color[i];
-      ctx.fill();
-      ctx.closePath();
-      move(i);
-    }
-
     // ボールを動かす
     function move(i) {
       balls[i].x += balls[i].speedx;
@@ -157,7 +136,7 @@
       } else if (balls[i].x > canvas.width - balls[i].radius) {
         balls[i].x = canvas.width - balls[i].radius
       }
-      
+
       // 厳密に壁の当たり判定を実施
       balls[i].y += balls[i].speedy;
       if (balls[i].y < balls[i].radius) {
@@ -167,55 +146,100 @@
       }
     }
 
-    // キャンバスの壁の当たり判定
-    function wall_bound(i) {
-      if (balls[i].x + balls[i].radius >= canvas.width || balls[i].x - balls[i].radius <= 0) {
-        balls[i].speedx *= -1;
-      }
-
-      if (balls[i].y + balls[i].radius >= canvas.height || balls[i].y - balls[i].radius <= 0) {
-        balls[i].speedy *= -1;
-      }
-    }
-
     // ボール同士の当たり判定
-    function ball_bound() {
+    function ball_bound(array) {
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
           // 各円のそれぞれの中点の距離
           main_distance = Math.sqrt((balls[i].x - balls[j].x) ** 2 + (balls[i].y - balls[j].y) ** 2);
           // 円の内側に接する正方形に対する中点からの最短距離
           sab_distance = balls[i].radius / Math.sqrt(2);
-          
+
           // 当たり判定がTrueの場合
           if (main_distance <= balls[i].radius + balls[j].radius) {
             // X方向の運動を主として考える
             if (balls[j].x + balls[j].radius < balls[i].x - sab_distance) { // balls[i]の左側に当たった場合
               if (balls[i].speedx != balls[j].speedx) {
                 balls[i].speedx *= -1;
+                balls[j].speedx *= -1;
+              } else if (balls[j].speedx > 0) {
+                balls[j].speedx *= -1;
+              } else {
+                balls[i].speedx *= -1;
               }
-              balls[j].speedx *= -1;
+
             } else if (balls[j].x - balls[j].radius > balls[i].x + sab_distance) { // balls[i]の右側に当たった場合
               if (balls[i].speedx != balls[j].speedx) {
+                balls[i].speedx *= -1;
+                balls[j].speedx *= -1;
+              } else if (balls[i].speedx > 0) {
+                balls[i].speedx *= -1;
+              } else {
                 balls[j].speedx *= -1;
               }
-              balls[i].speedx *= -1;
+
             } else if (balls[j].y + balls[j].radius <= balls[i].y - sab_distance) { // balls[i]の上側に当たった場合
               if (balls[i].speedy != balls[j].speedy) {
+                balls[i].speedy *= -1;
+                balls[j].speedy *= -1;
+              } else if (balls[i].speedy < 0) {
+                balls[i].speedy *= -1;
+              } else {
                 balls[j].speedy *= -1;
               }
-              balls[i].speedy *= -1;
+
             } else { // balls[i]の下側に当たった場合
               if (balls[i].speedy != balls[j].speedy) {
                 balls[i].speedy *= -1;
+                balls[j].speedy *= -1;
+              } else if (balls[j].speedy < 0) {
+                balls[j].speedy *= -1;
+              } else {
+                balls[i].speedy *= -1;
               }
-              balls[j].speedy *= -1;
+            }
+
+            if (color_count[$.inArray(array[i], color)] < count_upper) {
+              // 衝突回数カウント
+              color_count[$.inArray(array[i], color)]++;
+            } else {
+              balls[i].x = canvas.width * 2
+            }
+            if (color_count[$.inArray(array[j], color)] < count_upper) {
+              color_count[$.inArray(array[j], color)]++;
+            } else {
+              balls[j].x = canvas.width * 2
             }
           }
         }
       }
     }
-    
+
+    // キャンバスの壁の当たり判定
+    function wall_bound(array, i) {
+      if (balls[i].x + balls[i].radius >= canvas.width || balls[i].x - balls[i].radius <= 0) {
+        balls[i].speedx *= -1;
+
+        if (color_count[$.inArray(array[i], color)] < count_upper) {
+          // 衝突回数カウント
+          color_count[$.inArray(array[i], color)]++;
+        } else {
+          balls[i].x = canvas.width * 2
+        }
+      }
+
+      if (balls[i].y + balls[i].radius >= canvas.height || balls[i].y - balls[i].radius <= 0) {
+        balls[i].speedy *= -1;
+
+        if (color_count[$.inArray(array[i], color)] < count_upper) {
+          // 衝突回数カウント
+          color_count[$.inArray(array[i], color)]++;
+        } else {
+          balls[i].x = canvas.width * 2
+        }
+      }
+    }
+
     // 描画時にボールがめり込んだ状態であったら描画する前に補正
     function correctionback() {
       for (let i = 0; i < balls.length; i++) {
@@ -246,17 +270,95 @@
       }
     }
 
-    // キャンバス内を動き回る描写
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバス内の描画をすべてクリアする（X始点, Y始点, 横幅, 高さ）
-      for (let i = 0; i < balls.length; i++) {
-        drawArc(i);
+    function drawArc(array, i) {
+      // 衝突上限に達したら描かないし動かさない
+      if (color_count[$.inArray(array[i], color)] < count_upper) {
+        ctx.beginPath();
+        // 補正
+        correctionback();
+        // ボール同士の当たり判定
+        ball_bound(array);
+        wall_bound(array, i);
+        ctx.arc(balls[i].x, balls[i].y, balls[i].radius, 0, Math.PI * 2, false);
+        ctx.strokeStyle = array[i];
+        ctx.stroke();
+        ctx.fillStyle = array[i];
+        ctx.fill();
+        ctx.closePath();
+        move(i);
       }
-      correctionforward();
     }
 
-    // 25ミリ秒間隔で描き続ける
-    setInterval(draw, 10);
+    $("#start").hide();
+    // ボールを選択した際の処理
+    $(".balls_box").on("click", function () {
+      $(this).css("background-color", "#ffffff");
+      $(this).css("border-color", "#ffffff");
+      $("#start").show();
+    });
+    
+    // スタートボタンをクリックしたら
+    $("#start").on("click", function () {
+      $("#start").text("どのボールが生き残る？");
+      // ボールの色をシャッフルする
+      let color_shuffle = ["#070707", "#ffff00", "#006400", "#eb2142", "#eb8d21", "#800080", "#0000cd"];
+      arrangement(color_shuffle);
+
+      // ボールの初期配置の決定
+      firstXarray = arrangement(firstXarray);
+      for (let i = 0; i < balls.length; i++) {
+        balls[i].x = firstXarray[i];
+        balls[i].y = Math.floor(Math.random() * (canvas.height - (balls[i].radius * 2))) + balls[i].radius;
+        // ランダムに選んだYの値が奇数なら-X軸方向に動かす
+        if (balls[i].y % 2 == 1) {
+          balls[i].speedx *= -1;
+        }
+
+        // ランダムに選んだYの10の位がが奇数なら-Y軸方向に動かす
+        if (Math.floor(balls[i].y / 10) % 2 == 1) {
+          balls[i].speedy *= -1;
+        }
+      }
+
+      // キャンバス内を動き回る描写
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバス内の描画をすべてクリアする（X始点, Y始点, 横幅, 高さ）
+        for (let i = 0; i < balls.length; i++) {
+          drawArc(color_shuffle, i);
+        }
+        correctionforward();
+        
+        // 衝突回数の表示
+        $(".count_text").css("font-weight", "bold");
+        $(".count_text").css("font-size", "20px");
+        $("#black_count").text(color_count[0] + "回");
+        $("#yellow_count").text(color_count[1] + "回");
+        $("#green_count").text(color_count[2] + "回");
+        $("#red_count").text(color_count[3] + "回");
+        $("#orange_count").text(color_count[4] + "回");
+        $("#purple_count").text(color_count[5] + "回");
+        $("#blue_count").text(color_count[6] + "回");
+        
+        // ボールが最後の一つになったときに描画を止める
+        result = 0;
+        for (let i = 0; i < color_count.length; i++) {
+          if (color_count[i] < count_upper) {
+            result++;
+          }
+        }
+        if (result === 1) {
+          // 描画を一回進めて最後から2番目のボールを消す
+          ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバス内の描画をすべてクリアする（X始点, Y始点, 横幅, 高さ）
+          for (let i = 0; i < balls.length; i++) {
+            drawArc(color_shuffle, i);
+          }
+          clearInterval(drawset) // 描画終了
+        }
+      }
+      
+      // 25ミリ秒間隔で描き続ける
+      let drawset = setInterval(draw, 10);
+    });
 
   </script>
 </body>

@@ -5,15 +5,57 @@ body {
 main {
   width: auto;
   margin: 0 auto;
-  height: calc(100vh);
+  /* height: calc(100vh); */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
+#rule_section {
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rule_box {
+  width: 70%;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.left_rule_box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#start {
+  margin-left: 20px;
+  width: 400px;
+  height: 100px;
+  font-size: 25px;
+  border: 2px #a0a0a0 solid;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: rgb(188, 216, 219);
+  font-weight: bold;
+}
+
+#explanation {
+  padding: 0 20px;
+  border: 2px #685b5b solid;
+  border-radius: 5px;
+}
+
+#explanation h2 {
+  line-height: 0.8;
+}
+
 #balls_select {
   width: 100%;
+  height: 250px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,15 +63,66 @@ main {
 
 .balls_box {
   margin: 5px;
-  width: 9%;
+  width: 130px;
   height: 200px; /* 仮 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
   border-radius: 15px;
-  border: 1px #bfbfbf solid;
+  border: 2px #685b5b solid;
+  background-color: rgb(241, 237, 237);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: .2s ease-out; /* 3秒間で開始時に早く、終了時にゆっくり変化させる */
+}
+
+.balls_box:hover {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 3px 10px 0 rgba(0, 0, 0, 0.12), 0 4px 7px -2px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px); /* 上（Y）方向に動かす */
+  transform: translateX(-1px); /* 横（X）方向に動かす */
+}
+
+.balls {
+  width: 80px;
+  height: 80px;
+  border-radius: 100px;
+  border: 3px #222222 solid;
+}
+
+#black_ball {
+  border-color: #070707;
+  background-color: #070707;
+}
+#yellow_ball {
+  border-color: #ffff00;
+  background-color: #ffff00;
+}
+#green_ball {
+  border-color: #006400;
+  background-color: #006400;
+}
+#red_ball {
+  border-color: #eb2142;
+  background-color: #eb2142;
+}
+#orange_ball {
+  border-color: #eb8d21;
+  background-color: #eb8d21;
+}
+#purple_ball {
+  border-color: #800080;
+  background-color: #800080;
+}
+#blue_ball {
+  border-color: #0000cd;
+  background-color: #0000cd;
 }
 
 canvas {
+  margin-bottom: 10px;
   border: 2px #bfbfbf solid;
-  background-color: rgb(12, 12, 12);
+  background-color: rgb(158, 157, 157);
 }
 
 button {
