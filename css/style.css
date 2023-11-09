@@ -1,5 +1,5 @@
 body {
-  background-color: rgb(245, 237, 228);
+  background-color: rgb(236, 240, 245);
 }
 
 main {
@@ -13,14 +13,15 @@ main {
 }
 
 #rule_section {
-  width: 80%;
+  margin-top: 50px;
+  width: 90%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .rule_box {
-  width: 70%;
+  width: 75%;
   display: flex;
   justify-content: space-evenly;
 }
@@ -44,7 +45,7 @@ main {
 }
 
 #explanation {
-  padding: 0 20px;
+  padding: 0 40px;
   border: 2px #685b5b solid;
   border-radius: 5px;
 }
@@ -70,8 +71,8 @@ main {
   justify-content: center;
   align-items: center;
   border-radius: 15px;
-  border: 2px #685b5b solid;
-  background-color: rgb(241, 237, 237);
+  border: 3px #685b5b solid;
+  background-color: rgb(223, 228, 231);
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   transition: .2s ease-out; /* 3秒間で開始時に早く、終了時にゆっくり変化させる */
@@ -122,7 +123,8 @@ main {
 canvas {
   margin-bottom: 10px;
   border: 2px #bfbfbf solid;
-  background-color: rgb(158, 157, 157);
+  background-image: url("../images/bluesky.jpg");
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 3px 10px 0 rgba(0, 0, 0, 0.12), 0 4px 7px -2px rgba(0, 0, 0, 0.2);
 }
 
 button {
@@ -138,9 +140,9 @@ button {
 }
 
 button:hover {
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 3px 10px 0 rgba(0, 0, 0, 0.12), 0 4px 7px -2px rgba(0, 0, 0, 0.2);
-    transform: translateY(-3px); /* 上（Y）方向に動かす */
-    transform: translateX(-2px); /* 横（X）方向に動かす */
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.12), 0 3px 10px 0 rgba(0, 0, 0, 0.12), 0 4px 7px -2px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px); /* 上（Y）方向に動かす */
+  transform: translateX(-2px); /* 横（X）方向に動かす */
 }
 
 #submit {
