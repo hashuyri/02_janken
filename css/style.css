@@ -67,7 +67,7 @@ main {
   height: 200px; /* 仮 */
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
   border-radius: 15px;
   border: 2px #685b5b solid;
