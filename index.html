@@ -87,7 +87,7 @@
 
     const x = 2; // 1描写当たりにX軸に進む
     const y = 2; // 1描写当たりにY軸に進む
-    const count_upper = 20; // 衝突回数の上限
+    const count_upper = 30; // 衝突回数の上限
     let canvas = document.getElementById("canvas");
     let ctx = canvas.getContext("2d");
     let main_distance = 0; // 円の中心同士の距離
@@ -95,10 +95,10 @@
     let correction = 0; // 円の被っている距離
     let result = 0; // ボールが残り一つかどうかの判定用
     let choice = 0; // クリックできるボールを一つに絞る用
-    
+
     // 円の初期配置のX軸候補
     let firstXarray = [70, 210, 350, 490, 630, 770, 910];
-    
+
     // それぞれのボール
     let balls = [{ x: 0, y: 0, radius: 50, speedx: x, speedy: y },
     { x: 0, y: 0, radius: 50, speedx: x, speedy: y },
@@ -108,7 +108,7 @@
     { x: 0, y: 0, radius: 50, speedx: x, speedy: y },
     { x: 0, y: 0, radius: 50, speedx: x, speedy: y }];
     let rank = balls.length; // 順番付け用
-    
+
     // ボールの色
     const color = ["#070707", "#ffff00", "#006400", "#eb2142", "#eb8d21", "#800080", "#0000cd"];
     const color_id = ["#black_count", "#yellow_count", "#green_count", "#red_count", "#orange_count", "#purple_count", "#blue_count"];
@@ -128,6 +128,24 @@
         array[r] = tmp;
       }
       return array;
+    }
+
+    function firstposion(){
+      // ボールの初期配置の決定
+      firstXarray = arrangement(firstXarray);
+      for (let i = 0; i < balls.length; i++) {
+        balls[i].x = firstXarray[i];
+        balls[i].y = Math.floor(Math.random() * (canvas.height - (balls[i].radius * 2))) + balls[i].radius;
+        // ランダムに選んだYの値が奇数なら-X軸方向に動かす
+        if (balls[i].y % 2 == 1) {
+          balls[i].speedx *= -1;
+        }
+
+        // ランダムに選んだYの10の位がが奇数なら-Y軸方向に動かす
+        if (Math.floor(balls[i].y / 10) % 2 == 1) {
+          balls[i].speedy *= -1;
+        }
+      }
     }
 
     // ボールを動かす
@@ -244,12 +262,14 @@
           if (main_distance < balls[i].radius + balls[j].radius) {
             do {
               correction = balls[i].radius + balls[j].radius - main_distance;
-              balls[i].x -= Math.ceil(correction / Math.sqrt(2)) * balls[i].speedx / Math.abs(balls[i].speedx);
-              balls[i].y -= Math.ceil(correction / Math.sqrt(2)) * balls[i].speedy / Math.abs(balls[i].speedy);
+              balls[i].x -= Math.ceil(correction / Math.sqrt(2)) * 1.1 * balls[i].speedx / Math.abs(balls[i].speedx);
+              balls[i].y -= Math.ceil(correction / Math.sqrt(2)) * 1.1 * balls[i].speedy / Math.abs(balls[i].speedy);
               main_distance = Math.sqrt((balls[i].x - balls[j].x) ** 2 + (balls[i].y - balls[j].y) ** 2);
             } while (main_distance < balls[i].radius + balls[j].radius);
             // ボール同士の当たり判定
-            ball_bound(array, i, j);
+            if (color_count[$.inArray(array[i], color)] < count_upper) {
+              ball_bound(array, i, j);
+            }
           }
         }
       }
@@ -277,8 +297,8 @@
     // ボールを選択した際の処理
     $(".balls_box").on("click", function () {
       if (choice === 0) {
-        $(this).css("background-color", "rgb(215, 215, 215)");
-        $(this).css("border", "7px #eb2142 solid");
+        $(this).css("background-color", "rgb(177, 177, 177)");
+        $(this).css("border", "5px #eb2142 solid");
         $("#start").show();
         choice++;
       }
@@ -291,21 +311,8 @@
       let color_shuffle = ["#070707", "#ffff00", "#006400", "#eb2142", "#eb8d21", "#800080", "#0000cd"];
       arrangement(color_shuffle);
 
-      // ボールの初期配置の決定
-      firstXarray = arrangement(firstXarray);
-      for (let i = 0; i < balls.length; i++) {
-        balls[i].x = firstXarray[i];
-        balls[i].y = Math.floor(Math.random() * (canvas.height - (balls[i].radius * 2))) + balls[i].radius;
-        // ランダムに選んだYの値が奇数なら-X軸方向に動かす
-        if (balls[i].y % 2 == 1) {
-          balls[i].speedx *= -1;
-        }
-
-        // ランダムに選んだYの10の位がが奇数なら-Y軸方向に動かす
-        if (Math.floor(balls[i].y / 10) % 2 == 1) {
-          balls[i].speedy *= -1;
-        }
-      }
+      // ボールを初期配置
+      firstposion();
 
       // キャンバス内を動き回る描写
       function draw() {
@@ -321,7 +328,7 @@
             $(color_id[i]).css("font-weight", "bold");
             $(color_id[i]).css("font-size", "20px");
           } else if (color_count[i] === count_upper) {
-            $(color_id[i]).text(rank +"位");
+            $(color_id[i]).text(rank + "位");
             $(color_id[i]).css("font-size", "30px");
             $(color_id[i]).css("color", color[i]);
             $(color_id[i]).css("line-height", 0.8);
@@ -342,7 +349,7 @@
           ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバス内の描画をすべてクリアする（X始点, Y始点, 横幅, 高さ）
           for (let i = 0; i < balls.length; i++) {
             if (color_count[i] < count_upper) {
-              $(color_id[i]).text(rank +"位");
+              $(color_id[i]).text(rank + "位");
               $(color_id[i]).css("font-size", "30px");
               $(color_id[i]).css("color", color[i]);
               $(color_id[i]).css("line-height", 0.8);
@@ -353,7 +360,7 @@
         }
       }
 
-      // 25ミリ秒間隔で描き続ける
+      // 10ミリ秒間隔で描き続ける
       let drawset = setInterval(draw, 10);
     });
 
