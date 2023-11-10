@@ -87,7 +87,7 @@
 
     const x = 2; // 1描写当たりにX軸に進む
     const y = 2; // 1描写当たりにY軸に進む
-    const count_upper = 30; // 衝突回数の上限
+    const count_upper = 300; // 衝突回数の上限
     let canvas = document.getElementById("canvas");
     let ctx = canvas.getContext("2d");
     let main_distance = 0; // 円の中心同士の距離
@@ -174,42 +174,42 @@
 
       // X方向の運動を主として考える
       if (balls[j].x + balls[j].radius < balls[i].x - sab_distance) { // balls[i]の左側に当たった場合
-        if (balls[i].speedx != balls[j].speedx) {
+        if (balls[i].speedx < 0 && balls[j].speedx > 0) {
           balls[i].speedx *= -1;
           balls[j].speedx *= -1;
-        } else if (balls[j].speedx > 0) {
+        } else if (balls[i].speedx > 0 && balls[j].speedx > 0) {
           balls[j].speedx *= -1;
-        } else {
+        } else if (balls[i].speedx < 0 && balls[j].speedx < 0) {
           balls[i].speedx *= -1;
         }
 
       } else if (balls[j].x - balls[j].radius > balls[i].x + sab_distance) { // balls[i]の右側に当たった場合
-        if (balls[i].speedx != balls[j].speedx) {
+        if (balls[i].speedx > 0 && balls[j].speedx < 0) {
           balls[i].speedx *= -1;
           balls[j].speedx *= -1;
-        } else if (balls[i].speedx > 0) {
+        } else if (balls[i].speedx > 0 && balls[j].speedx > 0) {
           balls[i].speedx *= -1;
-        } else {
+        } else if (balls[i].speedx < 0 && balls[j].speedx < 0) {
           balls[j].speedx *= -1;
         }
 
       } else if (balls[j].y + balls[j].radius <= balls[i].y - sab_distance) { // balls[i]の上側に当たった場合
-        if (balls[i].speedy != balls[j].speedy) {
+        if (balls[i].speedy < 0 && balls[j].speedy > 0) {
           balls[i].speedy *= -1;
           balls[j].speedy *= -1;
-        } else if (balls[i].speedy < 0) {
+        } else if (balls[i].speedy < 0 && balls[j].speedy < 0) {
           balls[i].speedy *= -1;
-        } else {
+        } else if (balls[i].speedy > 0 && balls[j].speedy > 0) {
           balls[j].speedy *= -1;
         }
 
-      } else { // balls[i]の下側に当たった場合
-        if (balls[i].speedy != balls[j].speedy) {
+      } else if (balls[j].y - balls[j].radius >= balls[i].y + sab_distance) { // balls[i]の下側に当たった場合
+        if (balls[i].speedy > 0 && balls[j].speedy < 0) {
           balls[i].speedy *= -1;
           balls[j].speedy *= -1;
-        } else if (balls[j].speedy < 0) {
+        } else if (balls[i].speedy < 0 && balls[j].speedy < 0) {
           balls[j].speedy *= -1;
-        } else {
+        } else if (balls[i].speedy > 0 && balls[j].speedy > 0) {
           balls[i].speedy *= -1;
         }
       }
@@ -297,7 +297,6 @@
     // ボールを選択した際の処理
     $(".balls_box").on("click", function () {
       if (choice === 0) {
-        $(this).css("background-color", "rgb(177, 177, 177)");
         $(this).css("border", "5px #eb2142 solid");
         $("#start").show();
         choice++;
