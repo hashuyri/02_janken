@@ -4,7 +4,7 @@ const count_upper = 30; // 衝突回数の上限
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 let result; // ボールが残り一つかどうかの判定用
-let choice; // クリックできるボールを一つに絞る用
+let choice = 0; // クリックできるボールを一つに絞る用
 
 // 円の初期配置のX軸候補
 let firstXarray = [70, 210, 350, 490, 630, 770, 910];
@@ -90,6 +90,11 @@ $("#start").on("click", function () {
             }
             clearInterval(drawset) // 描画終了
         }
+    }
+    
+    // 結果が出そろったらキャンバスをトグルで非表示にできる
+    if (result === 1) {
+        $("canvas").slideToggle(300);
     }
 
     // 10ミリ秒間隔で描き続ける
