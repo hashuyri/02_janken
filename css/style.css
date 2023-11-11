@@ -120,6 +120,12 @@ main {
   background-color: #0000cd;
 }
 
+#canvas_section {
+  width: 1000px;
+  display: flex;
+  justify-content: center;
+}
+
 canvas {
   margin-bottom: 10px;
   border: 2px #bfbfbf solid;

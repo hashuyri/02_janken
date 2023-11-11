@@ -1,6 +1,9 @@
 let main_distance; // 円の中心同士の距離
 let sab_distance; // 円の内側に接する正四角形への中点からの最短距離
-let correction; // 円の被っている距離
+let speed_distance; // 1描画当たりに円が進む距離
+let correction; // 円同士の被っている距離
+
+speed_distance = x ** 2 + y ** 2;
 
 // 配列をシャッフルする
 function arrangement(array) {
@@ -51,6 +54,11 @@ function move(i) {
     } else if (balls[i].y > canvas.height - balls[i].radius) {
         balls[i].y = canvas.height - balls[i].radius
     }
+
+    // もし進む角度が初期値と異なれば初期値に戻す
+    if (balls[i].speedx ** 2 + balls[i].speedy ** 2 != speed_distance) {}
+    balls[i].speedx = x * balls[i].speedx / Math.abs(balls[i].speedx);
+    balls[i].speedy = y * balls[i].speedy / Math.abs(balls[i].speedy);
 }
 
 // ボール同士の当たり判定
@@ -67,8 +75,15 @@ function ball_bound(array, i, j) {
             balls[j].speedx *= -1;
         } else if (balls[i].speedx < 0 && balls[j].speedx < 0) {
             balls[i].speedx *= -1;
+            balls[j].speedx *= 1.2;
+            balls[j].speedy = Math.sqrt(speed_distance - (balls[j].speedx ** 2));
+        } else {
+            balls[i].speedx *= 1.2;
+            balls[i].speedy = Math.sqrt(speed_distance - (balls[i].speedx ** 2));
+            balls[j].speedx *= 1.2;
+            balls[j].speedy = Math.sqrt(speed_distance - (balls[j].speedx ** 2));
         }
-
+        
     } else if (balls[j].x - balls[j].radius > balls[i].x + sab_distance) { // balls[i]の右側に当たった場合
         if (balls[i].speedx > 0 && balls[j].speedx < 0) {
             balls[i].speedx *= -1;
@@ -76,9 +91,16 @@ function ball_bound(array, i, j) {
         } else if (balls[i].speedx > 0 && balls[j].speedx > 0) {
             balls[i].speedx *= -1;
         } else if (balls[i].speedx < 0 && balls[j].speedx < 0) {
+            balls[i].speedx *= 1.2;
+            balls[i].speedy = Math.sqrt(speed_distance - (balls[i].speedx ** 2));
             balls[j].speedx *= -1;
+        } else {
+            balls[i].speedx *= 1.2;
+            balls[i].speedy = Math.sqrt(speed_distance - (balls[i].speedx ** 2));
+            balls[j].speedx *= 1.2;
+            balls[j].speedy = Math.sqrt(speed_distance - (balls[j].speedx ** 2));
         }
-
+        
     } else if (balls[j].y + balls[j].radius <= balls[i].y - sab_distance) { // balls[i]の上側に当たった場合
         if (balls[i].speedy < 0 && balls[j].speedy > 0) {
             balls[i].speedy *= -1;
@@ -86,9 +108,16 @@ function ball_bound(array, i, j) {
         } else if (balls[i].speedy < 0 && balls[j].speedy < 0) {
             balls[i].speedy *= -1;
         } else if (balls[i].speedy > 0 && balls[j].speedy > 0) {
+            balls[i].speedy *= 1.2;
+            balls[i].speedx = Math.sqrt(speed_distance - (balls[i].speedy ** 2));
             balls[j].speedy *= -1;
+        } else {
+            balls[i].speedy *= 1.2;
+            balls[i].speedx = Math.sqrt(speed_distance - (balls[i].speedy ** 2));
+            balls[j].speedy *= 1.2;
+            balls[j].speedx = Math.sqrt(speed_distance - (balls[j].speedy ** 2));
         }
-
+        
     } else if (balls[j].y - balls[j].radius >= balls[i].y + sab_distance) { // balls[i]の下側に当たった場合
         if (balls[i].speedy > 0 && balls[j].speedy < 0) {
             balls[i].speedy *= -1;
@@ -97,6 +126,13 @@ function ball_bound(array, i, j) {
             balls[j].speedy *= -1;
         } else if (balls[i].speedy > 0 && balls[j].speedy > 0) {
             balls[i].speedy *= -1;
+            balls[j].speedy *= 1.2;
+            balls[j].speedx = Math.sqrt(speed_distance - (balls[j].speedy ** 2));
+        } else {
+            balls[i].speedy *= 1.2;
+            balls[i].speedx = Math.sqrt(speed_distance - (balls[i].speedy ** 2));
+            balls[j].speedy *= 1.2;
+            balls[j].speedx = Math.sqrt(speed_distance - (balls[j].speedy ** 2));
         }
     }
 
@@ -152,8 +188,8 @@ function correctionback(array) {
             if (main_distance < balls[i].radius + balls[j].radius) {
                 do {
                     correction = balls[i].radius + balls[j].radius - main_distance;
-                    balls[i].x -= Math.ceil(correction / Math.sqrt(2)) * 1.1 * balls[i].speedx / Math.abs(balls[i].speedx);
-                    balls[i].y -= Math.ceil(correction / Math.sqrt(2)) * 1.1 * balls[i].speedy / Math.abs(balls[i].speedy);
+                    balls[i].x -= Math.ceil(correction / Math.sqrt(2)) * balls[i].speedx / Math.abs(balls[i].speedx);
+                    balls[i].y -= Math.ceil(correction / Math.sqrt(2)) * balls[i].speedy / Math.abs(balls[i].speedy);
                     main_distance = Math.sqrt((balls[i].x - balls[j].x) ** 2 + (balls[i].y - balls[j].y) ** 2);
                 } while (main_distance < balls[i].radius + balls[j].radius);
                 // ボール同士の当たり判定
